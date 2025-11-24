@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Desimal di Antariksa</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Mengatur font global dan latar belakang */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b111a; /* Sangat gelap, mendekati hitam */
+            color: #e2e8f0;
+            /* Latar belakang galaksi samar-samar untuk estetika */
+            background-image: radial-gradient(circle at 10% 20%, #0d1a26 0%, #0b111a 90%);
+        }
+        /* Style untuk container utama */
+        .game-container {
+            max-width: 900px;
+            min-height: 95vh; /* Memastikan ruang vertikal cukup di semua layar */
+        }
+        /* Style untuk tombol */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem; /* Lebih membulat */
+            font-weight: 700;
+            box-shadow: 0 4px 15px -3px rgba(99, 102, 241, 0.5); /* Bayangan biru */
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 6px 20px -3px rgba(99, 102, 241, 0.7);
+        }
+        .btn-secondary {
+            background-color: #1e293b;
+            color: #94a3b8;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: 1px solid #334155;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #334155;
+            color: #f1f5f9;
+        }
+        /* Input styling yang lebih menonjol */
+        .input-style {
+            background-color: #1f2937;
+            border: 1px solid #475569;
+            color: #f3f4f6;
+            padding: 1rem; /* Lebih besar */
+            border-radius: 0.75rem;
+            transition: border-color 0.2s;
+        }
+        .input-style:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+        }
+        /* Style untuk card pertanyaan/level */
+        .level-card {
+            background-color: #111827; /* Lebih gelap dari background */
+            border: 1px solid #374151;
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px); /* Efek blur halus */
+        }
+        /* Area display pertanyaan */
+        .question-box {
+            background-color: #1f2937;
+            border: 2px solid #374151;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        /* Responsif untuk Opsi Jawaban */
+        .answer-option {
+            flex-grow: 1;
+            min-width: 120px; /* Minimal lebar tombol */
+            font-size: 1.25rem; /* Teks lebih besar */
+            font-weight: 600;
+        }
+        @media (max-width: 640px) {
+            .answer-option {
+                min-width: 100%; /* Satu tombol per baris di mobile */
+            }
+        }
+        /* Animation untuk pesan feedback */
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateY(-15px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+        #feedback-message {
+            animation: fadeInOut 3s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center items-start min-h-screen">
+
+    <div id="app" class="game-container w-full flex flex-col items-center py-6">
+
+        <!-- Header -->
+        <header class="text-center mb-10 w-full">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-400 drop-shadow-lg">
+                <i class="fas fa-rocket mr-3"></i> Petualangan Desimal
+            </h1>
+            <p class="text-indigo-300 mt-2 text-lg sm:text-xl">Kelas 7 SMP: Menguasai Operasi Desimal</p>
+            <div id="score-display" class="mt-4 text-xl font-bold bg-gray-800 p-3 rounded-xl inline-block shadow-2xl border border-gray-700">
+                Skor: 0 | Level: 1/5 (Soal: 1/10)
+            </div>
+        </header>
+
+        <!-- Halaman Input Data -->
+        <div id="user-info-page" class="w-full max-w-md level-card p-8 rounded-2xl space-y-5">
+            <h2 class="text-2xl font-extrabold text-center text-indigo-300 mb-6">Mulai Petualangan!</h2>
+            
+            <label for="name" class="block text-sm font-medium text-gray-400">Nama Lengkap</label>
+            <input type="text" id="name" placeholder="Cth: Siti Aminah" class="input-style w-full" required>
+            
+            <label for="class" class="block text-sm font-medium text-gray-400">Kelas</label>
+            <input type="text" id="class" placeholder="Cth: 7A" class="input-style w-full" required>
+            
+            <label for="email" class="block text-sm font-medium text-gray-400">Email</label>
+            <input type="email" id="email" placeholder="Cth: nama@sekolah.sch.id" class="input-style w-full" required>
+            
+            <button id="start-game-btn" class="btn-primary w-full mt-6 text-xl">
+                <i class="fas fa-satellite-dish mr-2"></i> Mulai Misi Antariksa
+            </button>
+        </div>
+
+        <!-- Halaman Permainan Utama -->
+        <div id="game-page" class="w-full max-w-2xl hidden level-card p-6 md:p-8 rounded-2xl space-y-6">
+            <h2 id="level-title" class="text-3xl font-extrabold text-center text-indigo-400">Level 1: Bandingkan Angka</h2>
+            <p id="level-description" class="text-center text-gray-400 text-lg">Tujuan: Bandingkan dan Urutkan Desimal</p>
+            
+            <!-- Area Pertanyaan -->
+            <div class="question-box p-6 rounded-xl shadow-lg">
+                <p id="question-text" class="text-2xl md:text-3xl font-bold text-center text-yellow-300 mb-6">Pertanyaan akan muncul di sini.</p>
+                <div id="answer-area" class="flex justify-center flex-wrap gap-4">
+                    <!-- Opsi Jawaban akan dimasukkan di sini oleh JS -->
+                </div>
+            </div>
+
+            <!-- Pesan Feedback -->
+            <div id="feedback-container" class="relative h-10">
+                <p id="feedback-message" class="absolute w-full text-center text-xl font-extrabold" style="opacity: 0;"></p>
+            </div>
+            
+            <!-- Tombol Lanjut/Selesai -->
+            <button id="next-question-btn" class="btn-primary w-full mt-4 text-xl hidden">
+                Lanjut ke Soal Berikutnya <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <!-- Halaman Selesai (Rangkuman) -->
+        <div id="summary-page" class="w-full max-w-md hidden level-card p-8 rounded-2xl space-y-6 text-center">
+            <h2 class="text-4xl font-extrabold text-green-400 mb-4"><i class="fas fa-trophy mr-2"></i> Misi Selesai!</h2>
+            <p class="text-xl text-gray-300">Anda telah berhasil menaklukkan Petualangan Desimal:</p>
+            
+            <div class="bg-gray-800 p-6 rounded-xl shadow-inner text-left border border-gray-700">
+                <p class="text-lg"><strong>Nama Kapten:</strong> <span id="summary-name" class="font-semibold text-white"></span></p>
+                <p class="text-lg"><strong>Kelas:</strong> <span id="summary-class" class="font-semibold text-white"></span></p>
+                <p class="text-lg"><strong>Email:</strong> <span id="summary-email" class="font-semibold text-white"></span></p>
+                <div class="mt-4 pt-3 border-t border-gray-700">
+                    <p class="text-3xl font-black text-yellow-400">Total Skor: <span id="summary-score"></span></p>
+                </div>
+            </div>
+
+            <!-- Area Pencapaian Baru -->
+            <div class="mt-6 bg-indigo-900/50 p-6 rounded-xl border border-indigo-700">
+                <h3 class="text-2xl font-bold text-indigo-300 mb-3">Level Pencapaian Anda:</h3>
+                <p id="achievement-title" class="text-3xl font-black text-yellow-300"></p>
+                <p id="achievement-description" class="text-gray-300 mt-2"></p>
+            </div>
+
+            <!-- Teks Ringkasan Akhir (Disesuaikan berdasarkan Skor) -->
+            <p id="final-summary-text" class="text-gray-400 text-lg"></p>
+            
+            <button class="btn-secondary w-full mt-4 text-lg" onclick="window.location.reload()">
+                <i class="fas fa-redo-alt mr-2"></i> Mulai Misi Baru
+            </button>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // Global constants
+        const MAX_QUESTIONS_PER_LEVEL = 10;
+        const FIXED_DECIMALS = 2; // Default precision for generated decimals
+
+        // Global variables for game state
+        let gameData = {};
+        let currentLevel = 1;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isQuestionActive = false; // Flag to prevent multiple clicks
+
+        // --- Helper Function: Generate Random Decimal ---
+        function generateRandomDecimal(min, max, fixed = FIXED_DECIMALS) {
+            const num = Math.random() * (max - min) + min;
+            return parseFloat(num.toFixed(fixed));
+        }
+
+        // --- Generator Functions (10 random questions per level) ---
+
+        // Level 1 Generator: Compare and Order Decimals (Find the LARGEST)
+        function generateLevel1Questions() {
+            const questions = [];
+            for (let i = 0; i < MAX_QUESTIONS_PER_LEVEL; i++) {
+                let options = [];
+                // Generate 4 unique decimals (using 2 or 3 fixed decimal places)
+                const fixed = Math.floor(Math.random() * 2) + 2; 
+                for (let j = 0; j < 4; j++) {
+                    options.push(generateRandomDecimal(0.1, 10, fixed).toString());
+                }
+                
+                options = Array.from(new Set(options)); 
+                
+                // Sort numerically to find the largest
+                const sorted = options.slice().map(s => parseFloat(s)).sort((a, b) => b - a);
+                const ans = sorted[0].toString();
+
+                questions.push({
+                    q: `Pilih desimal terbesar dari: ${options.join(', ')}`,
+                    ans: ans,
+                    options: options.sort(() => Math.random() - 0.5) // Shuffle options for display
+                });
+            }
+            return questions;
+        }
+
+        // Level 2 Generator: Add and Subtract Decimals
+        function generateLevel2Questions() {
+            const questions = [];
+            for (let i = 0; i < MAX_QUESTIONS_PER_LEVEL; i++) {
+                const fixed = Math.floor(Math.random() * 2) + 1; // 1 or 2 places
+                // Diubah dari const menjadi let agar bisa diubah di dalam blok if
+                let A = generateRandomDecimal(1, 20, fixed);
+                let B = generateRandomDecimal(1, 15, fixed);
+                let C = generateRandomDecimal(0.5, 5, fixed);
+
+                let q, ans;
+                const type = Math.floor(Math.random() * 3);
+
+                if (type === 0) { // A + B
+                    q = `${A.toFixed(fixed)} + ${B.toFixed(fixed)}`;
+                    ans = A + B;
+                } else if (type === 1) { // A - B (Ensure A > B)
+                    if (B > A) [A, B] = [B, A]; 
+                    q = `${A.toFixed(fixed)} - ${B.toFixed(fixed)}`;
+                    ans = A - B;
+                } else { // Mixed: A + B - C (Ensure overall result > 0)
+                    const sum = A + B;
+                    if (C >= sum) C = generateRandomDecimal(0.5, sum - 1, fixed);
+                    
+                    q = `${A.toFixed(fixed)} + ${B.toFixed(fixed)} - ${C.toFixed(fixed)}`;
+                    ans = sum - C;
+                }
+
+                questions.push({
+                    q: `Hitung: ${q}`,
+                    ans: parseFloat(ans.toFixed(fixed)), 
+                    tolerance: 0.001
+                });
+            }
+            return questions;
+        }
+
+        // Level 3 Generator: Multiply Decimals by Whole Numbers
+        function generateLevel3Questions() {
+            const questions = [];
+            for (let i = 0; i < MAX_QUESTIONS_PER_LEVEL; i++) {
+                const fixed = Math.floor(Math.random() * 2) + 1; // 1 or 2 places
+                const A = generateRandomDecimal(0.1, 5, fixed); // Decimal
+                const B = Math.floor(Math.random() * 10) + 2; // Whole number (2 to 11)
+
+                const q = `${B} x ${A.toFixed(fixed)}`;
+                const ans = A * B;
+
+                questions.push({
+                    q: `Hitung: ${q}`,
+                    ans: parseFloat(ans.toFixed(fixed)),
+                    tolerance: 0.001
+                });
+            }
+            return questions;
+        }
+
+        // Level 4 Generator: Divide Decimals by Whole Numbers
+        function generateLevel4Questions() {
+            const questions = [];
+            for (let i = 0; i < MAX_QUESTIONS_PER_LEVEL; i++) {
+                const fixed = Math.floor(Math.random() * 2) + 1; // 1 or 2 places
+                const divisor = Math.floor(Math.random() * 10) + 2; // Whole number (2 to 11)
+                const result = generateRandomDecimal(0.1, 5, fixed); // Target result
+
+                // Calculate dividend to ensure clean division
+                const dividend = divisor * result;
+                
+                const q = `${dividend.toFixed(fixed)} / ${divisor}`;
+                const ans = result;
+
+                questions.push({
+                    q: `Hitung: ${q}`,
+                    ans: parseFloat(ans.toFixed(fixed)),
+                    tolerance: 0.001
+                });
+            }
+            return questions;
+        }
+
+        // Level 5 Generator: Simplify Calculations Containing Decimals (Mixed)
+        function generateLevel5Questions() {
+            const questions = [];
+            for (let i = 0; i < MAX_QUESTIONS_PER_LEVEL; i++) {
+                const fixed = 1; // Keep it simple: 1 fixed place
+                // Diubah dari const menjadi let agar bisa diubah di dalam blok if/else
+                let A = generateRandomDecimal(1, 5, fixed);
+                let B = generateRandomDecimal(1, 5, fixed);
+                let C = Math.floor(Math.random() * 4) + 2; // Whole number (2 to 5)
+
+                let q, ans;
+                const type = Math.floor(Math.random() * 3);
+
+                if (type === 0) { // (A + B) * C
+                    q = `(${A.toFixed(fixed)} + ${B.toFixed(fixed)}) x ${C}`;
+                    ans = (A + B) * C;
+                } else if (type === 1) { // A * C - B
+                    const prod = A * C;
+                    if (B >= prod) B = generateRandomDecimal(1, prod / 2, fixed); // B diubah (sekarang menggunakan let)
+
+                    q = `${A.toFixed(fixed)} x ${C} - ${B.toFixed(fixed)}`;
+                    ans = prod - B;
+                } else { // (A * C) / C (Simplification focus)
+                    // Ensure C divides the resulting product smoothly if possible, but keeping it simple for mixed operations
+                    q = `${A.toFixed(fixed)} x (${B.toFixed(fixed)} + ${C}) / ${C}`;
+                    ans = A * ((B + C) / C);
+                }
+                
+                questions.push({
+                    q: `Hitung: ${q}`,
+                    ans: parseFloat(ans.toFixed(fixed)),
+                    tolerance: 0.001
+                });
+            }
+            return questions;
+        }
+
+
+        // --- Data Level Game (Menggunakan Generator) ---
+        const gameLevels = [
+            { 
+                title: "Level 1: Urutan Angka", 
+                description: "Tujuan: Bandingkan dan Urutkan Desimal (Pilih desimal TERBESAR)", 
+                type: "comparison", 
+                generator: generateLevel1Questions 
+            },
+            { 
+                title: "Level 2: Penambahan & Pengurangan", 
+                description: "Tujuan: Tambah dan Kurangi Desimal", 
+                type: "calculation", 
+                generator: generateLevel2Questions 
+            },
+            { 
+                title: "Level 3: Perkalian Dasar", 
+                description: "Tujuan: Kalikan Desimal dengan Bilangan Bulat", 
+                type: "calculation", 
+                generator: generateLevel3Questions 
+            },
+            { 
+                title: "Level 4: Pembagian Dasar", 
+                description: "Tujuan: Bagi Desimal dengan Bilangan Bulat", 
+                type: "calculation", 
+                generator: generateLevel4Questions 
+            },
+            { 
+                title: "Level 5: Sederhanakan Perhitungan", 
+                description: "Tujuan: Menyederhanakan Perhitungan Desimal Kompleks", 
+                type: "calculation", 
+                generator: generateLevel5Questions 
+            },
+        ];
+
+        // --- DOM Elements ---
+        const userInfoPage = document.getElementById('user-info-page');
+        const gamePage = document.getElementById('game-page');
+        const summaryPage = document.getElementById('summary-page');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const levelTitle = document.getElementById('level-title');
+        const levelDescription = document.getElementById('level-description');
+        const questionText = document.getElementById('question-text');
+        const answerArea = document.getElementById('answer-area');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const achievementTitle = document.getElementById('achievement-title');
+        const achievementDescription = document.getElementById('achievement-description');
+        const finalSummaryText = document.getElementById('final-summary-text'); // DITAMBAHKAN
+        
+        // Programmatic listener for the Next button
+        nextQuestionBtn.addEventListener('click', nextQuestion);
+
+        // --- Fungsi Utama Game Logic ---
+
+        // Memulai permainan setelah input data
+        startGameBtn.addEventListener('click', () => {
+            const name = document.getElementById('name').value.trim();
+            const classVal = document.getElementById('class').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!name || !classVal || !email) {
+                showFeedback("Semua kolom harus diisi!", "text-red-400");
+                return;
+            }
+
+            gameData = { name, class: classVal, email };
+            
+            // Ganti tampilan
+            userInfoPage.classList.add('hidden');
+            gamePage.classList.remove('hidden');
+
+            loadLevel(currentLevel);
+        });
+
+        // Memuat level dan pertanyaan saat ini
+        function loadLevel(level) {
+            currentLevel = level;
+            currentQuestionIndex = 0;
+            const levelData = gameLevels[level - 1];
+            
+            // PENTING: Generate 10 pertanyaan baru secara dinamis
+            levelData.questions = levelData.generator(); 
+
+            levelTitle.textContent = levelData.title;
+            levelDescription.textContent = levelData.description;
+            
+            loadQuestion(currentQuestionIndex);
+            updateScoreDisplay();
+        }
+
+        // Memuat pertanyaan berdasarkan indeks
+        function loadQuestion(index) {
+            isQuestionActive = true;
+            nextQuestionBtn.classList.add('hidden');
+            feedbackMessage.style.opacity = 0;
+
+            const levelData = gameLevels[currentLevel - 1];
+            const questionData = levelData.questions[index];
+
+            questionText.textContent = questionData.q;
+            answerArea.innerHTML = ''; // Bersihkan area jawaban
+            
+            // Reset layout for answer area
+            answerArea.classList.remove('flex-col', 'md:flex-row', 'items-center', 'space-y-4', 'md:space-y-0', 'md:space-x-4');
+            answerArea.classList.add('flex-wrap'); // Default for buttons
+
+            if (levelData.type === "comparison") {
+                // Tipe pertanyaan pilihan ganda (comparison/order)
+                questionData.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('btn-secondary', 'answer-option');
+                    button.onclick = () => checkComparisonAnswer(option, questionData.ans, button);
+                    answerArea.appendChild(button);
+                });
+            } else if (levelData.type === "calculation") {
+                // Tipe pertanyaan input (calculation/simplify)
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = 'any';
+                input.id = 'answer-input';
+                input.placeholder = 'Masukkan jawaban desimal (gunakan titik sebagai koma)...';
+                input.classList.add('input-style', 'text-center', 'text-xl', 'font-mono', 'w-full', 'max-w-xs');
+                answerArea.appendChild(input);
+
+                const submitBtn = document.createElement('button');
+                submitBtn.textContent = 'Kirim Jawaban';
+                submitBtn.classList.add('btn-primary', 'text-xl', 'ml-3', 'mt-4', 'md:mt-0'); // Tambahkan mt-4 untuk mobile
+                submitBtn.onclick = () => checkCalculationAnswer(questionData.ans, questionData.tolerance);
+                
+                // Pisahkan input dan tombol submit di mobile untuk responsif
+                answerArea.classList.remove('flex-wrap'); 
+                answerArea.classList.add('flex-col', 'md:flex-row', 'items-center', 'space-y-4', 'md:space-y-0', 'md:space-x-4');
+
+                answerArea.appendChild(submitBtn);
+                input.focus();
+            }
+        }
+
+        // Cek Jawaban (Pilihan Ganda/Comparison)
+        function checkComparisonAnswer(selected, correct, button) {
+            if (!isQuestionActive) return;
+            isQuestionActive = false;
+
+            // Nonaktifkan semua tombol
+            Array.from(answerArea.children).forEach(btn => btn.disabled = true);
+
+            if (selected === correct) {
+                score += 10;
+                showFeedback("Benar! +10 Poin!", "text-green-400");
+                button.classList.remove('btn-secondary');
+                button.classList.add('bg-green-600', 'ring-2', 'ring-green-400');
+            } else {
+                showFeedback("Salah. Jawaban yang benar adalah " + correct, "text-red-400");
+                button.classList.add('bg-red-600', 'ring-2', 'ring-red-400');
+                // Highlight jawaban benar
+                Array.from(answerArea.children).find(btn => btn.textContent === correct)?.classList.add('bg-green-600');
+            }
+
+            updateScoreDisplay();
+            nextQuestionBtn.classList.remove('hidden');
+        }
+
+        // Cek Jawaban (Input/Calculation)
+        function checkCalculationAnswer(correctAns, tolerance) {
+            if (!isQuestionActive) return;
+            const inputElement = document.getElementById('answer-input');
+            const submittedAnswer = parseFloat(inputElement.value);
+
+            if (isNaN(submittedAnswer)) {
+                showFeedback("Mohon masukkan angka yang valid.", "text-yellow-400");
+                return;
+            }
+
+            isQuestionActive = false;
+            
+            // Nonaktifkan input dan tombol Jawab
+            inputElement.disabled = true;
+            answerArea.querySelector('.btn-primary').disabled = true;
+
+            // Pembulatan/Toleransi (untuk floating point issues)
+            const isCorrect = Math.abs(submittedAnswer - correctAns) <= tolerance;
+
+            if (isCorrect) {
+                score += 20;
+                showFeedback("Hebat! Jawaban Tepat! +20 Poin!", "text-green-400");
+                inputElement.classList.add('border-green-400', 'ring-2', 'ring-green-400');
+            } else {
+                // Tampilkan jawaban yang benar dengan pembulatan yang tepat
+                const correctDisplay = parseFloat(correctAns.toFixed(3)).toString();
+                showFeedback(`Salah. Jawaban yang benar adalah ${correctDisplay}`, "text-red-400");
+                inputElement.classList.add('border-red-400', 'ring-2', 'ring-red-400');
+            }
+
+            updateScoreDisplay();
+            nextQuestionBtn.classList.remove('hidden');
+        }
+
+        // Lanjut ke pertanyaan berikutnya atau level berikutnya
+        function nextQuestion() {
+            currentQuestionIndex++;
+            const levelData = gameLevels[currentLevel - 1];
+
+            if (currentQuestionIndex < MAX_QUESTIONS_PER_LEVEL) {
+                // Ada pertanyaan lain di level ini
+                loadQuestion(currentQuestionIndex);
+            } else {
+                // Level Selesai
+                if (currentLevel < gameLevels.length) {
+                    // Lanjut ke level berikutnya
+                    currentLevel++;
+                    loadLevel(currentLevel);
+                } else {
+                    // Game Selesai Total
+                    showSummary();
+                }
+            }
+        }
+
+        // Menampilkan pesan feedback temporer
+        function showFeedback(message, colorClass) {
+            feedbackMessage.textContent = message;
+            feedbackMessage.className = `absolute w-full text-center text-xl font-extrabold ${colorClass}`;
+            feedbackMessage.style.opacity = 1;
+            // Restart animation
+            feedbackMessage.style.animation = 'none';
+            void feedbackMessage.offsetWidth; // Trigger reflow
+            feedbackMessage.style.animation = 'fadeInOut 3s ease-in-out forwards';
+        }
+
+        // Memperbarui tampilan skor
+        function updateScoreDisplay() {
+            // Maksimum soal adalah 10, jika sudah di soal ke-10 dan belum next, tampilkan 10
+            const displayIndex = Math.min(currentQuestionIndex + 1, MAX_QUESTIONS_PER_LEVEL);
+            scoreDisplay.innerHTML = `Skor: ${score} | Level: ${currentLevel}/${gameLevels.length} (Soal: ${displayIndex}/${MAX_QUESTIONS_PER_LEVEL})`;
+        }
+        
+        // --- Fungsi baru untuk menentukan pencapaian ---
+        function determineAchievement(totalScore) {
+            let title, description, color, finalSummary;
+            
+            if (totalScore >= 810) { // 90% ke atas
+                title = "Komandan Galaksi (A+)";
+                description = "Pencapaian sempurna! Anda adalah Master Desimal sejati dan siap memimpin misi di angkasa!";
+                color = "text-yellow-400";
+                finalSummary = "Selamat! Dengan skor ini, Anda adalah **Komandan Galaksi** yang siap memimpin misi matematika tingkat lanjut!";
+            } else if (totalScore >= 630) { // 70% ke atas
+                title = "Pilot Mahir (B+)";
+                description = "Kinerja sangat baik. Anda menguasai sebagian besar operasi desimal dan memiliki kendali yang kuat.";
+                color = "text-green-400";
+                finalSummary = "Kerja bagus! Anda adalah **Pilot Mahir** yang siap mengambil tantangan yang lebih kompleks. Pertahankan performa ini!";
+            } else if (totalScore >= 450) { // 50% ke atas
+                title = "Navigator Andal (C+)";
+                description = "Kinerja baik. Memiliki pemahaman yang solid tentang konsep dasar. Terus tingkatkan akurasi Anda!";
+                color = "text-indigo-400";
+                finalSummary = "Teruslah berlatih! Anda adalah **Navigator Andal** yang memiliki dasar kuat. Fokus pada operasi yang kurang sempurna.";
+            } else if (totalScore >= 270) { // 30% ke atas
+                title = "Kadet Pemula (D)";
+                description = "Perlu latihan lebih lanjut pada operasi desimal yang lebih kompleks. Jangan menyerah, ulang misi ini!";
+                color = "text-orange-400";
+                finalSummary = "Misi berhasil, namun Anda perlu waktu di akademi! Ulangi sesi ini untuk menjadi **Pilot yang Andal**.";
+            } else { // Di bawah 30%
+                title = "Pencari Bintang (E)";
+                description = "Kembali ke akademi dan ulas materi desimal dasar. Dasar-dasar perlu diperkuat.";
+                color = "text-red-4;00";
+                finalSummary = "Sesi latihan sangat dibutuhkan! Ayo ulas materi dasar dan coba lagi. **Anda PASTI BISA!**";
+            }
+
+            return { title, description, color, finalSummary };
+        }
+
+        // Menampilkan halaman rangkuman
+        function showSummary() {
+            gamePage.classList.add('hidden');
+            summaryPage.classList.remove('hidden');
+
+            document.getElementById('summary-name').textContent = gameData.name;
+            document.getElementById('summary-class').textContent = gameData.class;
+            document.getElementById('summary-email').textContent = gameData.email;
+            document.getElementById('summary-score').textContent = score;
+
+            // Tentukan dan tampilkan pencapaian
+            const achievement = determineAchievement(score);
+            achievementTitle.textContent = achievement.title;
+            achievementTitle.classList.remove('text-yellow-300', 'text-green-400', 'text-indigo-400', 'text-orange-400', 'text-red-400'); // Bersihkan class lama
+            achievementTitle.classList.add(achievement.color);
+            achievementDescription.textContent = achievement.description;
+
+            // Tampilkan teks ringkasan akhir yang dinamis
+            // Gunakan regex untuk membuat teks tebal (bold) yang menggunakan '**'
+            const finalSummaryHtml = achievement.finalSummary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            finalSummaryText.innerHTML = finalSummaryHtml;
+
+
+            // Sembunyikan header skor saat di halaman rangkuman
+            document.querySelector('header').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
